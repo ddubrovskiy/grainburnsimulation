@@ -35,7 +35,53 @@ def to_local(points):
     #print(np.round(local_points, 3))
     return local_points
 
+
+def triangulation_2d(points):
+    tri = Delaunay(points)
+    simpls = tri.simplices
+    #print(simpls)
+    return simpls
+
+def triangulation_3d(points, simpls):
+    newtrs = []
+    for i in range(len(simpls)):
+        newtr = []
+        for j in simpls[i]:
+            newtr.append(points[j])
+        newtrs.append(newtr)
+    newtrs = np.array(newtrs)
+    return newtrs
+
+
+def triangulate_with_3d_points(points):
+    lcl_pnts = []
+    for i in range(len(points)):
+        lcl = to_local(points[i])
+        lcl = np.array(lcl)
+        lcl_pnts.append(lcl)
+    new_mesh = []
+    for i in range(len(lcl_pnts)):
+        simpls = triangulation_2d(lcl_pnts[i])
+        new_triangles = triangulation_3d(points[i], simpls)
+        new_triangles = np.array(new_triangles)
+        new_mesh.append(new_triangles)
+        
+    return new_mesh
+    
+
 pnts = load_from_pickle("grouped_triangulation_points.pkl")
+print(len(pnts))
+remesh = triangulate_with_3d_points(pnts)
+save_to_pickle(remesh, "remeshed_groups.pkl")
+lens = []
+for i in range(len(remesh)):
+    lens.append(len(remesh[i]))
+print(lens[1539])
+lens = np.array(lens)
+index = np.argmax(lens)
+print(index)
+new_triangles = remesh[1539]
+"""
 pnt = pnts[0]
 print(pnt)
 lcl_pnts = []
@@ -49,32 +95,7 @@ for i in range(len(pnts)):
 print(len(errors))
 lcl_pnt = lcl_pnts[0]
 print(np.round(lcl_pnt, 1))
-
-def triangulation_2d(points):
-    tri = Delaunay(points)
-    simpls = tri.simplices
-    print(simpls)
-    return simpls
-
-def triangulation_3d(points, simpls):
-    newtrs = []
-    for i in range(len(simpls)):
-        newtr = []
-        for j in simpls[i]:
-            newtr.append(points[j])
-        newtrs.append(newtr)
-    newtrs = np.array(newtrs)
-    return newtrs
-
-simpls = triangulation_2d(lcl_pnt)
-new_triangles = triangulation_3d(pnt, simpls)
-new_triangles = np.array(new_triangles)
-print(new_triangles)
-
-
-
-
-
+"""
 
 
 

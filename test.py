@@ -393,6 +393,7 @@ for coord in coords:
     if(np.abs(np.sqrt(coord[0]**2 + coord[1]**2) - R) < 0.1):
         outer.append(coord)
 
+##################################################### FINDING GROUPED COLLISIONS
 def grouped_collisions(collisions):
     grouped_collisions = []
     for i in range(len(collisions)):
@@ -405,6 +406,7 @@ def grouped_collisions(collisions):
         grouped_collisions.append(colls)
     return grouped_collisions
 
+##################################################### PREPARING FOR TRIANGULATION OF A GROUP
 def pretriangulate(groups):
     pretriangulate_points = []
     for group in groups:
