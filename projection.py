@@ -96,7 +96,17 @@ print(len(errors))
 lcl_pnt = lcl_pnts[0]
 print(np.round(lcl_pnt, 1))
 """
-
+collisions = load_from_pickle("collisions_final.pkl")
+semi3d = []
+for i in range(len(collisions)):
+    flag = True
+    for j in range(len(collisions[i])):
+        if (collisions[i][j][2] < 39 or collisions[i][j][2] > 1250):
+            flag = False
+    if flag == True:
+        semi3d.append(collisions[i])
+        
+print("Collisions > 40z", len(semi3d))
 
 
 
@@ -108,7 +118,7 @@ vtk_points = vtk.vtkPoints()
 
 vtk_cells = vtk.vtkCellArray()
 
-for i, polygon in enumerate(new_triangles):
+for i, polygon in enumerate(semi3d):
     for point in polygon:
         vtk_points.InsertNextPoint(point)
     

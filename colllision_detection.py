@@ -349,8 +349,7 @@ col = []
 coordinates = np.load("step20from0.npy")
 coor = np.copy(coordinates)
 coordinates = coordinates.reshape(-1, 3, 3)     
-clsn_ = np.load("collisions.npy")   
-clsn = np.array([clsn_[5], clsn_[7]])
+
 """
 bnd = []
 for i in range(len(clsn_)):
@@ -364,7 +363,6 @@ print(bnd)
 np.save("bounds.npy", bnd)
 """
 lbnd = np.load("bounds.npy")
-print(lbnd[0])
 vtk_points = vtk.vtkPoints()
 
 bnd_points = vtk.vtkPoints()
@@ -374,7 +372,7 @@ for i in lbnd:
 for i in coor:
     coord_points.InsertNextPoint(i[0], i[1], i[2])
 
-pklcrd = load_from_pickle("collisions_new.pkl")
+pklcrd = load_from_pickle("collisions_final.pkl")
 trs = load_from_pickle("step20from0.pkl")
 
 vtk_cells = vtk.vtkCellArray()
@@ -448,26 +446,27 @@ def get_triangle_center(triangle_points):
 
 # Добавление текста с индексом треугольника в его центр
 def add_text_to_renderer(renderer, center, index):
-    text = vtk.vtkVectorText()
-    text.SetText(str(index))  # Индекс треугольника
+    if index == 2:
+        text = vtk.vtkVectorText()
+        text.SetText(str(index))  # Индекс треугольника
 
-    text_mapper = vtk.vtkPolyDataMapper()
-    text_mapper.SetInputConnection(text.GetOutputPort())
+        text_mapper = vtk.vtkPolyDataMapper()
+        text_mapper.SetInputConnection(text.GetOutputPort())
 
-    text_actor = vtk.vtkActor()
-    text_actor.SetMapper(text_mapper)
-    text_actor.SetPosition(center[0], center[1], center[2])  # Центр треугольника
+        text_actor = vtk.vtkActor()
+        text_actor.SetMapper(text_mapper)
+        text_actor.SetPosition(center[0], center[1], center[2])  # Центр треугольника
 
-    #text_actor.GetPositionCoordinate().SetCoordinateSystemToWorld()  # Мировые координаты
-    renderer.AddActor(text_actor)
+        #text_actor.GetPositionCoordinate().SetCoordinateSystemToWorld()  # Мировые координаты
+        renderer.AddActor(text_actor)
 
 renderer = vtk.vtkRenderer()
 render_window = vtk.vtkRenderWindow()
 render_window.AddRenderer(renderer)
 
 # Добавление индексов для каждого треугольника
-for i in range(len(trs)):  # Для каждого треугольника
-    triangle_points = [trs[i][0], trs[i][1], trs[i][2]]
+for i in range(len(pklcrd)):  # Для каждого треугольника
+    triangle_points = [pklcrd[i][0], pklcrd[i][1], pklcrd[i][2]]
     center = get_triangle_center(triangle_points)  # Находим центр треугольника
     add_text_to_renderer(renderer, center, i)  # Добавляем текст с индексом
 
@@ -523,7 +522,7 @@ diffuse_slider = create_slider("Diffuse", 0.0, 1.0, 1.0, 0.6, "diffuse")
 specular_slider = create_slider("Specular", 0.0, 1.0, 0.0, 0.4, "specular")
 
 renderer.AddActor(actor)
-renderer.AddActor(pointActor)
+#renderer.AddActor(pointActor)
 #renderer.AddActor(coordActor)
 renderer.SetBackground(0.1, 0.1, 0.1)
 render_window.Render()
